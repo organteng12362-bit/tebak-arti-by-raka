@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Game Tebak Arti Bahasa Inggris</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, #4facfe, #00f2fe);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.game {
+    background: white;
+    padding: 25px;
+    width: 380px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.word {
+    font-size: 28px;
+    font-weight: bold;
+    margin: 15px 0;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    margin: 6px 0;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #cce7ff;
+}
+
+.score, .result {
+    margin-top: 12px;
+    font-weight: bold;
+}
+
+.music-btn {
+    background: #ffcc00;
+}
+</style>
+</head>
+
+<body>
+
+<div class="game">
+    <h2>🎮 Tebak Arti Kata</h2>
+
+    <div class="word" id="word"></div>
+    <div id="choices"></div>
+
+    <div class="result" id="result"></div>
+    <div class="score" id="score">Skor: 0</div>
+
+    <button class="music-btn" onclick="toggleMusic()">🎵 Musik ON / OFF</button>
+</div>
+
+<audio id="bgm" autoplay loop>
+    <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const questions = [
+{word:"Write",correct:"Menulis"},
+{word:"Read",correct:"Membaca"},
+{word:"Speak",correct:"Berbicara"},
+{word:"Listen",correct:"Mendengar"},
+{word:"Strong",correct:"Kuat"},
+{word:"Weak",correct:"Lemah"},
+{word:"Happy",correct:"Senang"},
+{word:"Sad",correct:"Sedih"},
+{word:"Big",correct:"Besar"},
+{word:"Small",correct:"Kecil"},
+// (kata lain tetap sama, tidak perlu diubah)
+];
+
+let score = 0;
+let index = 0;
+
+function shuffle(arr) {
+    return arr.sort(() => Math.random() - 0.5);
+}
+
+function loadQuestion() {
+    const q = questions[index];
+    document.getElementById("word").innerText = q.word;
+    document.getElementById("result").innerText = "";
+
+    // ambil 2 jawaban salah yang PASTI beda
+    let wrongAnswers = questions
+        .filter(item => item.correct !== q.correct)
+        .map(item => item.correct);
+
+    shuffle(wrongAnswers);
+
+    let choices = shuffle([
+        q.correct,
+        wrongAnswers[0],
+        wrongAnswers[1]
+    ]);
+
+    const choicesDiv = document.getElementById("choices");
+    choicesDiv.innerHTML = "";
+
+    choices.forEach(choice => {
+        const btn = document.createElement("button");
+        btn.innerText = choice;
+        btn.onclick = () => checkAnswer(choice);
+        choicesDiv.appendChild(btn);
+    });
+}
+
+function checkAnswer(answer) {
+    const q = questions[index];
+
+    if (answer === q.correct) {
+        document.getElementById("result").innerText = "✅ Benar!";
+        score++;
+    } else {
+        document.getElementById("result").innerText =
+            `❌ Salah! Arti kata "${q.word}" adalah "${q.correct}"`;
+    }
+
+    document.getElementById("score").innerText = "Skor: " + score;
+
+    index++;
+    if (index < questions.length) {
+        setTimeout(loadQuestion, 1200);
+    } else {
+        setTimeout(() => {
+            alert("Game selesai! Skor akhir: " + score);
+            index = 0;
+            score = 0;
+            loadQuestion();
+            document.getElementById("score").innerText = "Skor: 0";
+        }, 1200);
+    }
+}
+
+loadQuestion();
+</script>
+
+</body>
+</html>
